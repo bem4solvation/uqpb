@@ -127,7 +127,7 @@ for i in range(n_tests):
                 os.remove(arch)
             os.chdir('..')
             os.rmdir('mesh_temp')
-"""
+
     except Exception:
         import sys
         exc_type,value,traceback=sys.exc_info()
@@ -141,4 +141,3 @@ for i in range(n_tests):
                 os.remove(arch)
             os.chdir('..')
             os.rmdir('mesh_temp')
-"""

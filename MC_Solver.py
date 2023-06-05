@@ -1,6 +1,3 @@
-
-
-
 # Comienza programa para calcular energias de solvatacion de molecula informada en input_config.prm del directorio
 
 #Librerias importantes
@@ -19,9 +16,18 @@ warnings.simplefilter("ignore",SparseEfficiencyWarning)
 parametros=leer_archivo_entrada('input_config.prm')
 
 # Se comienza escritura de archivo de salida
+
 output_file = parametros['OUTPUT_FILE']
+
+# Si directorio del archivo parametros no existe, se crea
+directory = os.path.dirname(output_file)
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+
+
 csv_data=open(output_file,'w')
-csv_data.write('ITERATION,SOLV. ENERGY,GMRES Iterations,Elapsed time,Number of elements\n')
+csv_data.write('ITERATION,SOLV. ENERGY,Elapsed time,Number of elements\n')
 csv_data.close()
 
 # Average Thermal Length: definicion de funciones y creacion de diccionario
@@ -36,6 +42,10 @@ for atomo,masa in masas.items():
 
 # Se agitan las moleculas utilizando los parametros iniciales
 path = parametros['TESTPATH']
+
+directory = os.path.dirname(path)
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 n_tests         = parametros['N_TESTS']
 mainfile        = parametros['PQRFILE']
@@ -66,33 +76,38 @@ for i in range(n_tests):
     
     try:
         start_time=time()
-        
+        # Se crea y limpia objeto simulation
+        simulation = pbj.electrostatics.Simulation()
+
         # Carga de archivo pqr 
         molecule=pbj.Solute(test_file,mesh_generator='msms',mesh_density=parametros['DENSIDAD'])
+
+        # Se agrega soluto
+        simulation.add_solute(molecule)
+
+        # Parametros de la simulacion
+        simulation.gmres_tolerance        = 1e-5
+        simulation.gmres_max_iterations   = 400
+        simulation.kappa                  = parametros['KAPPA']
         
-        # Parametros del objeto molecule
-        molecule.gmres_tolerance        = 1e-5
-        molecule.gmres_max_iterations   = 400
-        molecule.ep_in                  = parametros['EP_IN']
-        molecule.kappa                  = parametros['KAPPA']
+        simulation.solutes[0].ep_in       = parametros['EP_IN']
+        
 
         #Calculo de energia de solvatacion electrostatica
-        molecule.calculate_solvation_energy()
+        simulation.calculate_solvation_energy()
         
         #Impresion por pantalla
         ET=time()-start_time
-        print('INFO: {0}\ti:{1},\t {2}\t(kcal/mol), {3} it.,\t {4} [s],{5} elem.'.format(output_file.split('.')[0],i, 
-        molecule.solvation_energy,
-        molecule.solver_iteration_count, 
+        print('INFO: {0}\ti:{1},\t {2}\t(kcal/mol)\t {3} [s],{4} elem.'.format(output_file.split('.')[0],i, 
+        molecule.results["solvation_energy"],
         round(ET,3),
         molecule.mesh.number_of_elements))
 
         # Escritura en archivo de salida
         csv_data=open(output_file,'a')
-        csv_data.write('{0},{1},{2},{3},{4}\n'.format(
+        csv_data.write('{0},{1},{2},{3}\n'.format(
             i,
-            molecule.solvation_energy,
-            molecule.solver_iteration_count,
+            molecule.results["solvation_energy"],
             round(ET,3),
             molecule.mesh.number_of_elements))
         csv_data.close()
@@ -112,6 +127,7 @@ for i in range(n_tests):
                 os.remove(arch)
             os.chdir('..')
             os.rmdir('mesh_temp')
+"""
     except Exception:
         import sys
         exc_type,value,traceback=sys.exc_info()
@@ -125,3 +141,4 @@ for i in range(n_tests):
                 os.remove(arch)
             os.chdir('..')
             os.rmdir('mesh_temp')
+"""

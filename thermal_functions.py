@@ -90,6 +90,9 @@ def leer_archivo_entrada(prm_file):
 
 
 def shake_file(mainfile,i,path,remarks,end,nombre_molecula,atoms,n_tests,ATL_dic): 
+    # Si no existe el path se crea
+    if not os.path.exists(path):
+        os.makedirs(path)
     file = open(os.path.join(path,new_name(nombre_molecula+'.pqr',i,n_tests)) ,'w')
     file.write(remarks)
     list_atoms=atoms.split('\n')
@@ -124,3 +127,5 @@ def shake_file(mainfile,i,path,remarks,end,nombre_molecula,atoms,n_tests,ATL_dic
     file.write(end)
     file.close()
     return None
+
+shake_file("tests/tetrafluoromethane/tetrafluoromethane0.pqr",0,"tests\\tetrafluoromethane","","","tetrafluoromethane","",5,{})

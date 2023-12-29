@@ -137,14 +137,14 @@ def shake_file(
     return None
 
 
-shake_file(
-    "tests/tetrafluoromethane/tetrafluoromethane0.pqr",
-    0,
-    "tests\\tetrafluoromethane",
-    "",
-    "",
-    "tetrafluoromethane",
-    "",
-    5,
-    {},
-)
+#shake_file(
+#    "tests/tetrafluoromethane/tetrafluoromethane0.pqr",
+#    0,
+#    "tests/tetrafluoromethane",
+#    "",
+#    "",
+#    "tetrafluoromethane",
+#    "",
+#    5,
+#    {},
+#)

@@ -37,16 +37,16 @@ csv_data.write("ITERATION,SOLV. ENERGY,Elapsed time,Number of elements\n")
 csv_data.close()
 
 # Average Thermal Length: definicion de funciones y creacion de diccionario
-ATL_dic = {}
-kB = 1.3806e-23  # Constante de Stefan-Boltzmann
-t = parametros["TIEMPO"]  # Tiempo característico
-T = 298  # Temperatura en Kelvin
-vt = lambda m, T: np.sqrt(
-    kB * t / m
-)  # thermal velocity en funcion de masa y temperatura (298K por defecto)
-L = lambda m, T: vt(m, T) * t * 1e10  # 1e10 convierte la unidad a Angstroms
-for atomo, masa in masas.items():
-    ATL_dic[atomo] = L(masa, T)
+#ATL_dic = {}
+#kB = 1.3806e-23  # Constante de Stefan-Boltzmann
+#t = parametros["TIEMPO"]  # Tiempo característico
+#T = 298  # Temperatura en Kelvin
+#vt = lambda m, T: np.sqrt(
+#    kB * t / m 
+#)  # thermal velocity en funcion de masa y temperatura (298K por defecto)
+#L = lambda m, T: vt(m, T) * t * 1e10  # 1e10 convierte la unidad a Angstroms
+#for atomo, masa in masas.items():
+#    ATL_dic[atomo] = L(masa, T)
 
 # Se agitan las moleculas utilizando los parametros iniciales
 path = parametros["TESTPATH"]
@@ -65,6 +65,7 @@ atoms = """"""
 end = """"""
 arch = open(mainfile)
 post_atoms = False
+N_atoms = 0
 for line in arch:
     data = line.split()
     if data[0] != "ATOM" and not post_atoms:
@@ -72,10 +73,10 @@ for line in arch:
     elif data[0] == "ATOM":
         post_atoms = True
         atoms += line
+        N_atoms += 1
     else:
         end += line
 arch.close()
-
 
 for i in range(n_tests):
     # Se crea nuevo archivo pqr

@@ -4,7 +4,7 @@ import sys
 import os
 import pbj
 
-from utilities import masas
+from utilities import masas, amino_acids
 
 def check_parser(argv):
     """
@@ -54,7 +54,7 @@ def count_pqr_atoms(pqr_file):
 
     return n_atom
 
-def atom_name_fix(atom, es_biomolecula=False):
+def atom_name_fix(atom, is_biomolecule=False):
 	"""
 	Tomando un string correspondiente al átomo de un archivo pdb (formato C1, C2, etc) 
 	se retorna sólo el elemento químico sin el número.
@@ -65,7 +65,7 @@ def atom_name_fix(atom, es_biomolecula=False):
 	for caracter in atom:
 		if caracter not in "0123456789":
 			final += caracter
-	if es_biomolecula:
+	if is_biomolecule:
 		for elem in "CHONSP":
 			if elem in final:
 				return elem
@@ -73,7 +73,7 @@ def atom_name_fix(atom, es_biomolecula=False):
 
 
 
-def average_thermal_length(atom_name, t_thermal):
+def average_thermal_length(atom_name, res_name, t_thermal):
     """
     Calculate the average thermal length for each atom
     """
@@ -91,7 +91,13 @@ def average_thermal_length(atom_name, t_thermal):
     r_thermal = numpy.zeros(len(atom_name))
     for i, atom_raw in enumerate(atom_name):
         
-        atom = atom_name_fix(atom_raw)
+        if res_name[i] in amino_acids:
+            is_biomolecule = True
+        else:
+            is_biomolecule = False
+
+        atom = atom_name_fix(atom_raw, is_biomolecule)
+
         if atom not in ATL_dic:
             print("Atom " + atom + " not found")
             return
@@ -142,7 +148,7 @@ def write_new_pqr(pqr_file, x_new, out_pqr_name):
 
     new_pqr.close()
 
-def read_pqr_positions(pqr_file):
+def read_pqr(pqr_file):
     """
     Read in teh x,y,z positions in the pqr
     """
@@ -158,6 +164,7 @@ def read_pqr_positions(pqr_file):
     i = 0
     x_atom = numpy.zeros((n_atom,3), dtype=float)
     atom_name = numpy.empty((n_atom,), dtype=object)
+    res_name = numpy.empty((n_atom,), dtype=object)
     for line in pqr_data:
 
         if line.startswith("ATOM"):
@@ -181,10 +188,11 @@ def read_pqr_positions(pqr_file):
             x_atom[i,2] = float(z)   
 
             atom_name[i] = words[2]
+            res_name[i]  = words[3]
 
             i+=1
 
-    return x_atom, atom_name
+    return x_atom, atom_name, res_name
 
 def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob_dist='uniform', shake_radius=None, t_thermal=1e-8):
     """
@@ -197,9 +205,10 @@ def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob
 
     pqr_file = pqr_dir + pqr_file_name
 
-    x_base, atom_name = read_pqr_positions(pqr_file) 
+    x_base, atom_name, res_name = read_pqr(pqr_file) 
 
-    r_thermal = average_thermal_length(atom_name, t_thermal)
+    if shake_radius == None:
+        r_thermal = average_thermal_length(atom_name, res_name, t_thermal)
 
     for i in range(n_test):
 

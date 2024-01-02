@@ -6,6 +6,7 @@ import sys
 import glob
 import argparse
 from time import time
+from datetime import datetime
 import gc
 from scipy.sparse import csr_matrix, SparseEfficiencyWarning
 import warnings
@@ -15,8 +16,9 @@ def check_parser(argv):
     Reads the inputs from the command line
     """
 
-    parser = argparse.ArgumentParser(description="generate random variables for montecarlo")
+    parser = argparse.ArgumentParser(description="Run PBJ calculations for all pqr files in a folder")
     parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Folder with pqr samples')
+    parser.add_argument('-of','--output_file_name', dest='output_file_name', type=str, default=None, help='Output file name')
     parser.add_argument('-k','--kappa', dest='kappa', type=float, default=0.125, help='Inverse of Debye length, defaults to 0.125 angs^-1')
     parser.add_argument('-e1','--epsilon_in', dest='epsilon_in', type=float, default=4., help='Dielectric constant in molecule region. Defaults to 4.')
     parser.add_argument('-d','--mesh_density', dest='mesh_density', type=float, default=4., help='Vertices per square angs of surface mesh. Defaults to 4.')
@@ -29,15 +31,33 @@ def check_parser(argv):
 
     return args.folder, args.kappa, args.epsilon_in, args.mesh_density, args.n_subset
 
+def generate_unique_file_name(file_name):
 
-def run_mc(folder, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
+    if not os.path.exists(file_name):
+        return file_name
+
+    # Extract name and extension
+    file_clean, file_extension = os.path.splitext(file_path)
+
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+
+    new_file_name = f"{file_name}_{timestamp}{file_extension}"
+
+    return new_file_name
+
+def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
 
     warnings.simplefilter("ignore", SparseEfficiencyWarning)
 
-    output_file = folder + "output.csv"
+    if output_file_name==None:
+        output_file = folder + "output.csv"
+    else:
+        output_file = folder + output_file_name
+
+    output_file = generate_unique_file_name(output_file)
 
     csv_data = open(output_file, "w")
-    csv_data.write("ITERATION,SOLV. ENERGY,Elapsed time,Number of elements\n")
+    csv_data.write("ITERATION,PQR FILE, SOLV. ENERGY,Elapsed time,Number of elements\n")
 
     pqr_files = glob.glob(folder + "*.pqr")
 
@@ -89,9 +109,10 @@ def run_mc(folder, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
 
             # Escritura en archivo de salida
             csv_data.write(
-                "{0},{1},{2},{3}\n".format(
+                "{0},{1},{2},{3},{4}\n".format(
                     i,
-                    molecule.results["solvation_energy"],
+                    test_file,
+                    simulation.solutes[0].results["solvation_energy"],
                     round(ET, 3),
                     molecule.mesh.number_of_elements,
                 )
@@ -132,5 +153,5 @@ def run_mc(folder, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
 
 if __name__ == "__main__":
 
-    folder, kappa, epsilon_in, mesh_density, n_subset = check_parser(sys.argv[1:])
-    run_mc(folder, kappa, epsilon_in, mesh_density, n_subset)
+    folder, output_file_name, kappa, epsilon_in, mesh_density, n_subset = check_parser(sys.argv[1:])
+    run_mc(folder, output_file_name, kappa, epsilon_in, mesh_density, n_subset)

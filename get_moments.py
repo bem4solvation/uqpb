@@ -1,4 +1,3 @@
-# Librerias importantes
 import os
 import numpy 
 import pandas
@@ -14,7 +13,7 @@ def check_parser(argv):
     """
 
     parser = argparse.ArgumentParser(description="Calculate moments for results in a csv file of a folder")
-    parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Folder with pqr samples')
+    parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Folder with csv files')
 
     args = parser.parse_args(argv)
 
@@ -24,7 +23,7 @@ def check_parser(argv):
     return args.folder
 
 
-def get_moments(folder, columns_to_process =["SOLV. ENERGY","POLAR ENERGY","CAVITY ENERGY","DISPERSION ENERGY","NONPOLAR ENERGY"]):
+def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_energy","disp_energy","nonpolar_energy"]):
 
     output_file = folder + "output_summary.csv"
 
@@ -58,4 +57,4 @@ def get_moments(folder, columns_to_process =["SOLV. ENERGY","POLAR ENERGY","CAVI
 if __name__ == "__main__":
 
     folder  = check_parser(sys.argv[1:])
-    get_moments(folder, columns_to_process=["SOLV. ENERGY"])
+    get_moments(folder)

@@ -29,7 +29,7 @@ def check_parser(argv):
     if args.folder[-1] != "/":
         args.folder += "/"
 
-    return args.folder, args.kappa, args.epsilon_in, args.mesh_density, args.n_subset
+    return args.folder, args.output_file_name, args.kappa, args.epsilon_in, args.mesh_density, args.n_subset
 
 def generate_unique_file_name(file_name):
 
@@ -37,17 +37,18 @@ def generate_unique_file_name(file_name):
         return file_name
 
     # Extract name and extension
-    file_clean, file_extension = os.path.splitext(file_path)
+    file_clean, file_extension = os.path.splitext(file_name)
 
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    new_file_name = f"{file_name}_{timestamp}{file_extension}"
+    new_file_name = f"{file_clean}_{timestamp}{file_extension}"
 
     return new_file_name
 
 def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
 
     warnings.simplefilter("ignore", SparseEfficiencyWarning)
+
 
     if output_file_name==None:
         output_file = folder + "output.csv"
@@ -57,7 +58,7 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
     output_file = generate_unique_file_name(output_file)
 
     csv_data = open(output_file, "w")
-    csv_data.write("ITERATION,PQR FILE, SOLV. ENERGY,Elapsed time,Number of elements\n")
+    csv_data.write("iter,pqr_file,elec_energy,cav_energy,disp_energy,nonpolar_energy,solv_energy,elapsed_time,number_of_elements\n")
 
     pqr_files = glob.glob(folder + "*.pqr")
 
@@ -75,7 +76,7 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
             test_file = pqr_files[i]
             
             # Se crea y limpia objeto simulation
-            simulation = pbj.electrostatics.Simulation()
+            simulation = pbj.implicit_solvent.Simulation()
 
             # Carga de archivo pqr
             molecule = pbj.Solute(
@@ -109,9 +110,13 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
 
             # Escritura en archivo de salida
             csv_data.write(
-                "{0},{1},{2},{3},{4}\n".format(
+                "{0},{1},{2},{3},{4},{5},{6},{7},{8}\n".format(
                     i,
                     test_file,
+                    simulation.solutes[0].results["electrostatic_solvation_energy"],
+                    simulation.solutes[0].results["cavity_energy"],
+                    simulation.solutes[0].results["dispersion_energy"],
+                    simulation.solutes[0].results["nonpolar_solvation_energy"],
                     simulation.solutes[0].results["solvation_energy"],
                     round(ET, 3),
                     molecule.mesh.number_of_elements,

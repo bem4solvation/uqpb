@@ -1164,3 +1164,24 @@ cantidad_atomos={
 	"Z_12_dichloroethene":6,
 	"Z_pent_2_ene":15
 	}
+
+amino_acids = ["ALA",
+            "ARG",
+            "ASN",
+            "ASP",
+            "CYS",
+            "GLU",
+            "GLN",
+            "GLY",
+            "HIS",
+            "ILE",
+            "LEU",
+            "LYS",
+            "MET",
+            "PHE",
+            "PRO",
+            "SER",
+            "THR",
+            "TRP",
+            "TYR",
+            "VAL"]

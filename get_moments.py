@@ -29,7 +29,7 @@ def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_en
 
     #results_df = pandas.DataFrame(columns=['File','Mean','Standard deviation'])
 
-    csv_files = glob.glob(folder + "*.csv")
+    csv_files = glob.glob(folder + "**/*.csv")
 
     if output_file in csv_files:
         csv_files.remove(output_file)

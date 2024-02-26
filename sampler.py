@@ -14,6 +14,7 @@ def check_parser(argv):
     parser = argparse.ArgumentParser(description="generate random variables for montecarlo")
 
     parser.add_argument('-nt','--n_test', dest='n_test', type=int, default=10, help='Number of MC tests')
+    parser.add_argument('-nw','--n_workers', dest='n_workers', type=int, default=1, help='Number of folders to store configurations')
     parser.add_argument('-pqr','--pqr_file', dest='pqr_file', type=str, default=None, help='Base pqr file name')
     parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Working folder, defaults to name of pqr file')
     parser.add_argument('-pd','--prob_dist', dest='prob_dist', type=str, default='uniform', help='Probability distribution in shake. Uniform (default) or normal. Normal is the half normal distribution for the thermal radius.')
@@ -36,7 +37,7 @@ def check_parser(argv):
     if args.folder[-1] != "/":
         args.folder += "/"
 
-    return pqr_dir, pqr_file_name, args.folder, args.n_test, args.prob_dist, args.shake_radius, args.t_thermal
+    return pqr_dir, pqr_file_name, args.folder, args.n_test, args.n_workers, args.prob_dist, args.shake_radius, args.t_thermal
 
 def count_pqr_atoms(pqr_file):
     """
@@ -194,7 +195,7 @@ def read_pqr(pqr_file):
 
     return x_atom, atom_name, res_name
 
-def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob_dist='uniform', shake_radius=None, t_thermal=1e-8):
+def generate_random_samples(n_test, n_workers, n_atom, folder, pqr_dir, pqr_file_name, prob_dist='uniform', shake_radius=None, t_thermal=1e-8):
     """
     Generates random coefficients and modified pqr's
     """
@@ -202,6 +203,17 @@ def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob
     digits = len(str(n_test))
     if not os.path.exists(folder):
         os.makedirs(folder)
+
+    if n_workers>n_test:
+        print("n_workers has to be smaller than n_test, defaulting to n_workers=1")
+        n_workers = 1
+
+    jobs_per_worker = n_test//n_workers
+    digits_workers = len(str(n_workers))
+    for i in range(n_workers):
+        worker_folder = "job_"+str(i).zfill(digits_workers)+"/"
+        if not os.path.exists(folder + worker_folder):
+            os.makedirs(folder + worker_folder)
 
     pqr_file = pqr_dir + pqr_file_name
 
@@ -231,8 +243,14 @@ def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob
         else:
             r_thermal = shake_radius
         
-        out_file_name = folder + pqr_file_name[:-4] + "_" + str(i).zfill(digits) + "_coeff.txt"
-        out_pqr_name  = folder + pqr_file_name[:-4] + "_" + str(i).zfill(digits) + ".pqr"
+        worker_number = i//jobs_per_worker
+        if worker_number>=n_workers:
+            worker_number = i%n_workers
+
+        worker_folder = "job_" + str(worker_number).zfill(digits_workers) + "/"
+
+        out_file_name = folder + worker_folder + pqr_file_name[:-4] + "_" + str(i).zfill(digits) + "_coeff.txt"
+        out_pqr_name  = folder + worker_folder + pqr_file_name[:-4] + "_" + str(i).zfill(digits) + ".pqr"
 
         r     = shake[:,0] * r_thermal
         theta = shake[:,1] * 2 * numpy.pi
@@ -250,8 +268,8 @@ def generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob
 
 if __name__ == "__main__":
 
-    pqr_dir, pqr_file_name, folder, n_test, prob_dist, shake_radius, t_thermal = check_parser(sys.argv[1:])
+    pqr_dir, pqr_file_name, folder, n_test, n_workers, prob_dist, shake_radius, t_thermal = check_parser(sys.argv[1:])
     n_atom = count_pqr_atoms(pqr_dir+pqr_file_name)
-    generate_random_samples(n_test, n_atom, folder, pqr_dir, pqr_file_name, prob_dist, shake_radius, t_thermal)
+    generate_random_samples(n_test, n_workers, n_atom, folder, pqr_dir, pqr_file_name, prob_dist, shake_radius, t_thermal)
 
 

@@ -93,8 +93,8 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
 
             simulation.solutes[0].ep_in = epsilon_in
 
-            # Calculo de energia de solvatacion electrostatica
-            simulation.calculate_solvation_energy()
+            # Calculo de energia de solvatacion
+            simulation.calculate_solvation_energy(electrostatic_energy=True, nonpolar_energy=True)
 
             # Impresion por pantalla
             ET = time() - start_time

@@ -26,6 +26,7 @@ def check_parser(argv):
 def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_energy","disp_energy","nonpolar_energy"]):
 
     output_file = folder + "output_summary.csv"
+    output_file_consolidated = folder + "output_consolidated.csv"
 
     #results_df = pandas.DataFrame(columns=['File','Mean','Standard deviation'])
 
@@ -35,6 +36,7 @@ def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_en
         csv_files.remove(output_file)
 
     dfs = []
+    dfs_cons = []
     for input_csv in csv_files:
 
         df = pandas.read_csv(input_csv)
@@ -49,11 +51,19 @@ def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_en
         })
 
         dfs.append(local_result_df)
+        dfs_cons.append(df)
 
     results_df = pandas.concat(dfs, ignore_index=True)
-
     results_df.to_csv(output_file, index=False)
 
+    results_cons = pandas.concat(dfs_cons, ignore_index=True)
+    mean_row = results_cons.mean()
+    std_row = results_cons.std()
+
+    results_cons.loc['Mean'] = mean_row
+    results_cons.loc['Std_dev'] = std_row
+
+    results_cons.to_csv(output_file_consolidated, index=False)
 if __name__ == "__main__":
 
     folder  = check_parser(sys.argv[1:])

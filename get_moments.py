@@ -57,14 +57,18 @@ def get_moments(folder, columns_to_process =["solv_energy","elec_energy","cav_en
     results_df.to_csv(output_file, index=False)
 
     results_cons = pandas.concat(dfs_cons, ignore_index=True)
+    
+    # For avoiding warning on transform str to float, drop unnecesary columns
+    results_cons = results_cons.drop(columns=['iter', 'pqr_file']) 
+    
     mean_row = results_cons.mean()
     std_row = results_cons.std()
-
+    
     results_cons.loc['Mean'] = mean_row
     results_cons.loc['Std_dev'] = std_row
 
     results_cons.to_csv(output_file_consolidated, index=False)
 if __name__ == "__main__":
-
+    
     folder  = check_parser(sys.argv[1:])
     get_moments(folder)

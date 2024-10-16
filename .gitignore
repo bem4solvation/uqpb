@@ -3,3 +3,4 @@ CSV_data/
 __pycache__/
 mesh_temp/
 CTS_Solver.py
+output_folder/

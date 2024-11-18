@@ -39,11 +39,10 @@ if __name__ == "__main__":
     sampler_list = ["", "LHS", "Halton", "Hammersley", "Sobol"]
     n_test = 1000
     n_workers = 2
+    pqr_file = "mobley_test_pqr/1112_tetrachloroethane.pqr"
     folder = "tests"
     for sampler in sampler_list:
-        pqr_file = "mobley_test_pqr/1112_tetrachloroethane.pqr"
         folder_name = folder + "/" + create_folder_name(pqr_file,sampler)
         run_sampler(n_test, n_workers, pqr_file, folder_name, sampler)
         print("Creating folder: ", folder_name)
         time.sleep(10)
-    

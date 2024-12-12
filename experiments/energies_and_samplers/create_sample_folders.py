@@ -45,4 +45,4 @@ if __name__ == "__main__":
         folder_name = folder + "/" + create_folder_name(pqr_file,sampler)
         run_sampler(n_test, n_workers, pqr_file, folder_name, sampler)
         print("Creating folder: ", folder_name)
-        time.sleep(10)
+        time.sleep(5)

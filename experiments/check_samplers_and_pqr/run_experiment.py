@@ -17,6 +17,7 @@ from experiments.energies_and_samplers.create_sample_folders import run_sampler,
 pqr_file = "../mobley_test_pqr/1112_tetrachloroethane.pqr"
 n_test = 5000
 n_workers = 10
+digits_workers = len(str(n_workers))
 n_samples = n_test//n_workers
 exec_sampler = os.path.join("..","..","sampler.py")
 
@@ -42,7 +43,7 @@ for sampler in sampler_list:
     i = sampler_list.index(sampler)
 
     for job in range(n_workers):
-        job_folder = os.path.join(folder_name, f"job_{job:02}")
+        job_folder = os.path.join(folder_name, "job_{}".format(str(job).zfill(digits_workers)))
         list_of_coeff = os.listdir(job_folder)
         list_of_coeff = [x for x in list_of_coeff if x.endswith("_coeff.txt")]
         m = 0

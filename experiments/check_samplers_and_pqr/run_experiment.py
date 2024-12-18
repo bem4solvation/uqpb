@@ -36,13 +36,13 @@ for sampler in sampler_list:
 i_molecule = 0
 # data es una lista con una matriz por sampler
 # cada matriz tiene n_workers filas y n_samples columnas
-data = [numpy.zeros((n_workers,n_samples)) for _ in range(len(sampler_list))]
+data = [numpy.zeros((n_samples,n_workers)) for _ in range(len(sampler_list))]
 for sampler in sampler_list:
     folder_name = os.path.join(folder, create_folder_name(pqr_file,sampler))
     i = sampler_list.index(sampler)
 
-    for job in range(n_samples):
-        job_folder = os.path.join(folder_name, "job_{}".format(job))
+    for job in range(n_workers):
+        job_folder = os.path.join(folder_name, f"job_{job:02}")
         list_of_coeff = os.listdir(job_folder)
         list_of_coeff = [x for x in list_of_coeff if x.endswith("_coeff.txt")]
         m = 0
@@ -53,13 +53,15 @@ for sampler in sampler_list:
                     line = f.readline()
                     k += 1
             coeff = float(line.strip().split()[0]) # 0 por valor del radio
-            data[i][job,m] = coeff
+            data[i][m,job] = coeff
             m+=1
 
 # 3. Se guardan los datos de data en en archivos de texto
 
 for i,sampler in enumerate(sampler_list):
     output_folder = "random_coefficients"
+    if output_folder not in os.listdir():
+        os.mkdir(output_folder)
     file_name = sampler + "_coeff.txt"
     # Save file
     numpy.savetxt(os.path.join(output_folder,file_name),data[i],delimiter=',',newline='\n')

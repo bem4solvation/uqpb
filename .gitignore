@@ -3,4 +3,5 @@ CSV_data/
 __pycache__/
 mesh_temp/
 output_*/
-experiments/check_samplers_and_pqr/tests
+experiments/check_samplers_and_pqr/tests/
+experiments/check_samplers_and_pqr/random_coefficients/

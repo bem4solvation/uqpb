@@ -1,8 +1,5 @@
 import os
 import numpy
-import pandas
-import matplotlib.pyplot as plt
-import seaborn
 import sys
 
 # Agregra el directorio raiz (experiments) al path
@@ -15,15 +12,16 @@ from experiments.energies_and_samplers.create_sample_folders import run_sampler,
 # Setear molecula de prueba y parametros
 
 pqr_file = "../mobley_test_pqr/1112_tetrachloroethane.pqr"
-n_test = 5000
-n_workers = 10
+n_test = 10000
+n_workers = 50
 digits_workers = len(str(n_workers))
 n_samples = n_test//n_workers
 exec_sampler = os.path.join("..","..","sampler.py")
 
 # 1. Crear carpetas para guardar los resultados
 
-sampler_list = ["pseudo", "LHS", "Halton", "Hammersley", "Sobol"]
+#sampler_list = ["pseudo", "LHS", "Halton", "Hammersley", "Sobol"]
+sampler_list = ["pseudo", "Halton", "Hammersley", "Sobol"]
 folder = "tests"
 for sampler in sampler_list:
     folder_name = os.path.join(folder, create_folder_name(pqr_file,sampler))
@@ -56,6 +54,8 @@ for sampler in sampler_list:
             coeff = float(line.strip().split()[0]) # 0 por valor del radio
             data[i][m,job] = coeff
             m+=1
+            if m == n_samples:
+                break
 
 # 3. Se guardan los datos de data en en archivos de texto
 

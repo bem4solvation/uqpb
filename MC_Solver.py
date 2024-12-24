@@ -22,6 +22,7 @@ def check_parser(argv):
     parser.add_argument('-k','--kappa', dest='kappa', type=float, default=0.125, help='Inverse of Debye length, defaults to 0.125 angs^-1')
     parser.add_argument('-e1','--epsilon_in', dest='epsilon_in', type=float, default=4., help='Dielectric constant in molecule region. Defaults to 4.')
     parser.add_argument('-d','--mesh_density', dest='mesh_density', type=float, default=4., help='Vertices per square angs of surface mesh. Defaults to 4.')
+    parser.add_argument('-mg','--mesh_generator', dest='mesh_generator', type=str, default="nanoshaper", help='Mesh generator, msms or nanoshaper.')
     parser.add_argument('-sub','--n_subset', dest='n_subset', type=int, default=None, help='Number of cases if only a subset will be run. Takes first n_subset cases')
 
     args = parser.parse_args(argv)
@@ -45,7 +46,7 @@ def generate_unique_file_name(file_name):
 
     return new_file_name
 
-def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_density=4, n_subset=None):
+def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_density=4, mesh_generator="nanoshaper", n_subset=None):
 
     warnings.simplefilter("ignore", SparseEfficiencyWarning)
 
@@ -80,7 +81,7 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
 
             # Carga de archivo pqr
             molecule = pbj.Solute(
-                test_file, mesh_generator="msms", mesh_density=mesh_density
+                test_file, mesh_generator=mesh_generator, mesh_density=mesh_density
             )
 
             # Se agrega soluto
@@ -158,5 +159,5 @@ def run_mc(folder, output_file_name=None, kappa=0.125, epsilon_in=4., mesh_densi
 
 if __name__ == "__main__":
 
-    folder, output_file_name, kappa, epsilon_in, mesh_density, n_subset = check_parser(sys.argv[1:])
-    run_mc(folder, output_file_name, kappa, epsilon_in, mesh_density, n_subset)
+    folder, output_file_name, kappa, epsilon_in, mesh_density, mesh_generator, n_subset = check_parser(sys.argv[1:])
+    run_mc(folder, output_file_name, kappa, epsilon_in, mesh_density, mesh_generator, n_subset)

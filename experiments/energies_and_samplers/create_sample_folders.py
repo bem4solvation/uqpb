@@ -31,7 +31,7 @@ def create_folder_name(pqr_file,sampler):
     """Creates a folder name from the pqr file name and sampler"""
     if sampler=="":
         sampler = "pseudo"
-    folder_name = "output_{pqr_file}_{sampler}".format(pqr_file=pqr_file.split("/")[-1].split(".")[0],sampler=sampler)
+    folder_name = "output_{pqr_file}_{sampler}".format(pqr_file=os.path.split(pqr_file)[-1].split(".")[0],sampler=sampler)
     return folder_name
 
 if __name__ == "__main__":

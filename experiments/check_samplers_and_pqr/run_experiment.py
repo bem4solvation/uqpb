@@ -7,11 +7,13 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.abspath(os.path.join(current_dir, '../../'))
 sys.path.append(root_dir)
 
-from experiments.energies_and_samplers.create_sample_folders import run_sampler, create_folder_name
+from experiments.energies_and_samplers.create_sample_folders import  create_folder_name
 
 # Setear molecula de prueba y parametros
 
-pqr_file = "../mobley_test_pqr/1112_tetrachloroethane.pqr"
+#pqr_file = "../mobley_test_pqr/1112_tetrachloroethane.pqr"
+pqr_file = os.path.join("..","mobley_test_pqr","1112_tetrachloroethane.pqr")
+
 n_test = 10000
 n_workers = 50
 digits_workers = len(str(n_workers))
@@ -20,15 +22,20 @@ exec_sampler = os.path.join("..","..","sampler.py")
 
 # 1. Crear carpetas para guardar los resultados
 
-#sampler_list = ["pseudo", "LHS", "Halton", "Hammersley", "Sobol"]
-sampler_list = ["pseudo", "Halton", "Hammersley", "Sobol"]
-folder = "tests"
-for sampler in sampler_list:
-    folder_name = os.path.join(folder, create_folder_name(pqr_file,sampler))
-    print("Creating folder: ", folder_name)
-    os.system("python {} -nt {} -nw {} -pqr {} -f {} -sp {}".format(
-                exec_sampler,n_test, n_workers, pqr_file, folder_name, sampler)
-                )
+# Boolean value to create the folder and its subfolders with shaked values
+bool_create_folders = False
+
+if bool_create_folders:
+
+    #sampler_list = ["pseudo", "LHS", "Halton", "Hammersley", "Sobol"]
+    sampler_list = ["pseudo", "Halton", "Hammersley", "Sobol"]
+    folder = "tests"
+    for sampler in sampler_list:
+        folder_name = os.path.join(folder, create_folder_name(pqr_file,sampler))
+        print("Creating folder: ", folder_name)
+        os.system("python {} -nt {} -nw {} -pqr {} -f {} -sp {}".format(
+                    exec_sampler,n_test, n_workers, pqr_file, folder_name, sampler)
+                    )
     
 # 2. Leer resultados de coeficiente de agitación de radio, primera columna de los archivos _coeff.txt
 
@@ -67,10 +74,7 @@ for i,sampler in enumerate(sampler_list):
     # Save file
     numpy.savetxt(os.path.join(output_folder,file_name),data[i],delimiter=',',newline='\n')
 
-
-
-
-
+# 4. Se hace el mismo análisis de coeficientes, pero ahora de un átomo de la molécula usando los archivos pqr
 
 
 

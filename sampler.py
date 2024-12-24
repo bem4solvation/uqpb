@@ -76,6 +76,15 @@ def check_parser(argv):
         default=1e-8,
         help="Characteristic thermal time for thermal radius. Defaults to 1e-8.",
     )
+    parser.add_argument(
+        "-ib",
+        "--is_biomolecule",
+        dest="is_biomolecule",
+        type=bool,
+        default=False,
+        help="Boolean value to determine if the molecule is a biomolecule. Defaults to False.",
+    )
+
 
     args = parser.parse_args(argv)
 
@@ -102,6 +111,7 @@ def check_parser(argv):
         args.prob_dist,
         args.shake_radius,
         args.t_thermal,
+        args.is_biomolecule
     )
 
 
@@ -196,7 +206,7 @@ def quasirandom(n_samples, dimension, sampler):
     return np.asarray(sampler.generate(space, n_samples + skip)[skip:])
 
 
-def average_thermal_length(atom_name, res_name, t_thermal):
+def average_thermal_length(atom_name, res_name, t_thermal, is_biomolecule=False):
     """
     Calculate the average thermal length for each atom
     """
@@ -213,7 +223,7 @@ def average_thermal_length(atom_name, res_name, t_thermal):
 
     r_thermal = numpy.zeros(len(atom_name))
     for i, atom_raw in enumerate(atom_name):
-        if res_name[i] in amino_acids:
+        if res_name[i] in amino_acids and not is_biomolecule:
             is_biomolecule = True
         else:
             is_biomolecule = False
@@ -326,6 +336,7 @@ def generate_random_samples(
     prob_dist="uniform",
     shake_radius=None,
     t_thermal=1e-8,
+    is_biomolecule=False
 ):
     """
     Generates random coefficients and modified pqr's
@@ -351,7 +362,7 @@ def generate_random_samples(
     x_base, atom_name, res_name = read_pqr(pqr_file)
 
     if shake_radius == None:
-        r_thermal = average_thermal_length(atom_name, res_name, t_thermal)
+        r_thermal = average_thermal_length(atom_name, res_name, t_thermal, is_biomolecule)
 
     if prob_dist == "uniform":
         coeffs = sample(n_test, n_atom * 3, sampler=sampler)
@@ -426,6 +437,7 @@ if __name__ == "__main__":
         prob_dist,
         shake_radius,
         t_thermal,
+        is_biomolecule
     ) = check_parser(sys.argv[1:])
     n_atom = count_pqr_atoms(pqr_dir + pqr_file_name)
     generate_random_samples(
@@ -439,4 +451,5 @@ if __name__ == "__main__":
         prob_dist,
         shake_radius,
         t_thermal,
+        is_biomolecule
     )

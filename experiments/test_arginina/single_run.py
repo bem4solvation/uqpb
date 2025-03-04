@@ -14,15 +14,15 @@ simulation.add_solute(molecule)
 # Parametros de la simulacion
 simulation.gmres_tolerance = 1e-5
 simulation.gmres_max_iterations = 400
-simulation.kappa = kappa
+simulation.kappa = 0
 
-simulation.solutes[0].ep_in = epsilon_in
+simulation.solutes[0].ep_in = 4
 
 # Calculo de energia de solvatacion
 simulation.calculate_solvation_energy(electrostatic_energy=True, nonpolar_energy=True)
 
 # Impresion por pantalla
-ET = time() - start_time
+
 print(
     "INFO: {0}\ti:{1},\t {2}\t(kcal/mol)\t {3} [s],{4} elem.".format(
         output_file.split(".")[0],

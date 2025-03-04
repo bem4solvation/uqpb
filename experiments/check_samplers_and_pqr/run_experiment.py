@@ -76,5 +76,44 @@ for i,sampler in enumerate(sampler_list):
 
 # 4. Se hace el mismo análisis de coeficientes, pero ahora de un átomo de la molécula usando los archivos pqr
 
+i_molecule = 0
+# pdata es una lista con una matriz por sampler
+# cada matriz tiene n_workers filas, n_samples columnas y 3 capas (una por coordenada)
+pdata = [numpy.zeros((n_samples,n_workers,3)) for _ in range(len(sampler_list))]
+for sampler in sampler_list:
+    folder_name = os.path.join(folder, create_folder_name(pqr_file,sampler))
+    i = sampler_list.index(sampler)
+    for job in range(n_workers):
+        job_folder = os.path.join(folder_name, "job_{}".format(str(job).zfill(digits_workers)))
+        list_of_pqr = os.listdir(job_folder)
+        list_of_pqr = [x for x in list_of_pqr if x.endswith(".pqr")]
+        m = 0
+        for pqr_file in list_of_pqr:
+            with open(os.path.join(job_folder, pqr_file), "r") as f:
+                k = 0
+                while k<=i_molecule:
+                    line = f.readline()
+                    k += 1
+            coords = tuple(map(float,line.strip().split()[5:8])) 
+            data[i][m,job,:] = coords
+            m+=1
+            if m == n_samples:
+                break
 
+# 5. Se guardan los datos de data en en archivos de texto
 
+for i,sampler in enumerate(sampler_list):
+    output_folder = "random_shaked_pqr"
+    if output_folder not in os.listdir():
+        os.mkdir(output_folder)
+    file_name = sampler + "_coeff.csv"
+    
+
+    # Los valores de cada capa se separan con ; 
+    i_data = data[i]
+    new_2Darray = numpy.zeros((i_data.shape[0],i_data.shape[1]*3))
+    for j in range(3):
+        new_2Darray[:,j::3] = i_data[:,:,j]
+    
+    # Save file
+    numpy.savetxt(os.path.join(output_folder,file_name),data[i],delimiter=',',newline='\n')

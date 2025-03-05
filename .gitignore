@@ -1,6 +1,16 @@
+# Python
+__pycache__/
+
+# PBJ
+mesh_temp/
+
+# output uqpb  and more
 tests/
 CSV_data/
-__pycache__/
-mesh_temp/
+output_*/
 CTS_Solver.py
-output_folder/
+
+# experiments
+experiments/check_samplers_and_pqr/tests/
+experiments/check_samplers_and_pqr/random_coefficients/
+local_data/

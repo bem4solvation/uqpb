@@ -13,7 +13,7 @@ def check_parser(argv):
     """
 
     parser = argparse.ArgumentParser(description="Calculate moments for results in a csv file of a folder")
-    parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Folder with csv files')
+    parser.add_argument('-f','--folder', dest='folder', type=str, default="tests/", help='Folder with csv files')
 
     args = parser.parse_args(argv)
 

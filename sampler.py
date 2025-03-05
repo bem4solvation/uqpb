@@ -26,7 +26,7 @@ def check_parser(argv):
         "--n_workers",
         dest="n_workers",
         type=int,
-        default=2,
+        default=1,
         help="Number of folders to store configurations",
     )
     parser.add_argument(

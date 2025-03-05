@@ -17,7 +17,7 @@ def check_parser(argv):
     """
 
     parser = argparse.ArgumentParser(description="Run PBJ calculations for all pqr files in a folder")
-    parser.add_argument('-f','--folder', dest='folder', type=str, default=None, help='Folder with pqr samples')
+    parser.add_argument('-f','--folder', dest='folder', type=str, default="tests/job_0", help='Folder with pqr samples')
     parser.add_argument('-of','--output_file_name', dest='output_file_name', type=str, default=None, help='Output file name')
     parser.add_argument('-k','--kappa', dest='kappa', type=float, default=0.125, help='Inverse of Debye length, defaults to 0.125 angs^-1')
     parser.add_argument('-e1','--epsilon_in', dest='epsilon_in', type=float, default=4., help='Dielectric constant in molecule region. Defaults to 4.')
